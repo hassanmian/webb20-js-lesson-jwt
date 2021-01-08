@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {Switch, Route} from 'react-router-dom'
+import CustomerDetailPage from './pages/CustomerDetailPage'
 import CustomerListPage from './pages/CustomerListPage'
 import LoginPage from './pages/LoginPage'
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/customer-list">
           <CustomerListPage />
         </Route>
+        <Route path="/customers/:id" component={CustomerDetailPage} />
       </Switch>
       
       <hr/>
