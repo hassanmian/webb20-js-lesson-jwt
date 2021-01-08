@@ -1,9 +1,28 @@
-import React, {useState} from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 
-export default function CustomerCreatePage() {
+export default function CustomerUpdatePage(props) {
+  const customerId = props.match.params.id
+  
   const [formData, setFormData] = useState({})
   const history = useHistory()
+
+  function getCustomerItem() {
+    const url = `https://frebi.willandskill.eu/api/v1/customers/${customerId}/`
+    const token = localStorage.getItem("WEBB20")
+    fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    })
+    .then(res => res.json())
+    .then(data => setFormData(data))
+  }
+
+  useEffect( () => {
+    getCustomerItem()
+  }, [])
 
   function handleOnChange(e) {
     const name = e.target.name
@@ -18,34 +37,33 @@ export default function CustomerCreatePage() {
         <label>{label}</label>
         <input 
           type={type || "text"} 
-          name={name} 
+          name={name}
+          value={formData[name] || ""}
           onChange={handleOnChange}
         />
       </div>
     )
   }
 
-  function handleOnSubmit(e){
+  function handleOnSubmit(e) {
     e.preventDefault()
-    const url = "https://frebi.willandskill.eu/api/v1/customers/"
+    const url = `https://frebi.willandskill.eu/api/v1/customers/${customerId}/`
     const token = localStorage.getItem("WEBB20")
     fetch(url, {
-      method: "POST",
+      method: "PUT",
       body: JSON.stringify(formData),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       }
     })
-    .then( res => res.json())
-    .then( data => {
-      history.push('/customers')
-    })
+    .then(res => res.json())
+    .then(() => history.push(`/customers/${customerId}`))
   }
 
   return (
     <div>
-      <h1>Create Customer</h1>
+      <h1>Update Customer</h1>
       <form onSubmit={handleOnSubmit}>
         {renderInput("name", "Customer Name")}
         {renderInput("email", "Customer Email", "email")}
@@ -55,10 +73,10 @@ export default function CustomerCreatePage() {
         {renderInput("reference", "Reference")}
         {renderInput("vatNr", "Vat Number")}
         {renderInput("website", "Website", "url")}
-        <button type="submit">Create Customer</button>
+        <button type="submit">Update Customer</button>
 
       </form>
-      <code>{JSON.stringify(formData)}</code>
+
     </div>
   )
 }
